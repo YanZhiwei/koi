@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 
 from models.boss import Boss
 from models.job_summary import JobSummary

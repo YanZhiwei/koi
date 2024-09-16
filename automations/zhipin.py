@@ -1,6 +1,5 @@
-import re
 from typing import List
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 from playwright.async_api import Page, async_playwright
 
@@ -77,7 +76,7 @@ class Zhipin(object):
                 job_summary.name = job_name
                 job_summary.language = keyword
                 job_summary.area = job_area
-                job_summary.link = f"https://www.zhipin.com{job_link}"
+                job_summary.url = f"https://www.zhipin.com{job_link}"
                 job_summary.company = company_name
                 job_summary.salary = await job.locator(".salary").inner_text()
                 job_summary.tags = tags

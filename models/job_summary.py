@@ -11,3 +11,4 @@ class JobSummary:
     company: str = ""
     area: str = ""
     tags: List[str] = None
+    salary: str = ""

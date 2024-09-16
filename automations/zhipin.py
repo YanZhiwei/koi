@@ -1,5 +1,6 @@
 import re
 from typing import List
+from urllib.parse import parse_qs, urlparse
 
 from playwright.async_api import Page, async_playwright
 
@@ -76,6 +77,7 @@ class Zhipin(object):
                 job_summary.area = job_area
                 job_summary.link = f"https://www.zhipin.com{job_link}"
                 job_summary.company = company_name
+                job_summary.salary = await job.locator(".salary").inner_text()
                 job_summary.tags = tags
                 job_summary.description = info_desc
                 job_summary.id = self.__get__job_id(job_summary.link)
@@ -84,7 +86,7 @@ class Zhipin(object):
         return jobSummarys
 
     async def get_job(self, job_summary: JobSummary) -> Job:
-        job: Job = None
+        job: Job = Job()
         if not self.browser:
             await self.__instance_browser()
         page = await self.browser.new_page()
@@ -93,14 +95,14 @@ class Zhipin(object):
             wait_until="domcontentloaded",
         )
         await page.wait_for_selector(".job-detail")
-        job_summary = await page.locator(".job-detail").inner_html()
+        detail = await page.locator(".job-sec-text:not(.fold-text)").inner_html()
         posted_date = await page.locator("p.gray").inner_text()
-        job.detail = job_summary
         job.posted_date = posted_date
+        job.detail = detail
         return job
 
     def __get__job_id(self, job_url):
-        pattern = r"job_detail/([a-zA-Z0-9_\-]+)\.html"
-        match = re.search(pattern, job_url)
-        job_id = match.group(1) if match else job_url
+        parsed_url = urlparse(job_url)
+        path = parsed_url.path.split("/")[-1].split("?")[0]
+        job_id = path.split(".")[0]
         return job_id

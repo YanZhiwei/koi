@@ -81,7 +81,7 @@ class Zhipin(object):
                 job_summary.salary = await job.locator(".salary").inner_text()
                 job_summary.tags = tags
                 job_summary.description = info_desc
-                job_summary.id = self.__get__job_id(job_summary.link)
+                job_summary.id = self.__get__job_id(job_summary.url)
                 jobSummarys.append(job_summary)
         return jobSummarys
 
@@ -109,6 +109,7 @@ class Zhipin(object):
         job.boss.active_state = await page.locator(
             ".job-boss-info .boss-active-time"
         ).inner_text()
+        job.summary = job_summary
         return job
 
     def __get__job_id(self, job_url):

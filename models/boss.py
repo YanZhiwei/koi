@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(init=False)
 class Boss:
-    name: str
-    active_state: str
+    name: str = ""
+    title: str = ""
+    active_state: str = ""

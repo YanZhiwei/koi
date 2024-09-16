@@ -12,3 +12,4 @@ class JobSummary:
     area: str = ""
     tags: List[str] = None
     salary: str = ""
+    language: str = ""

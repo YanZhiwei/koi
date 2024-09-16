@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 from playwright.async_api import Page, async_playwright
 
 from chrome import get_chrome_path_windows
+from models.boss import Boss
 from models.job import Job
 from models.job_summary import JobSummary
 
@@ -74,6 +75,7 @@ class Zhipin(object):
                     tags.append(tag_text)
                 job_summary = JobSummary()
                 job_summary.name = job_name
+                job_summary.language = keyword
                 job_summary.area = job_area
                 job_summary.link = f"https://www.zhipin.com{job_link}"
                 job_summary.company = company_name
@@ -82,7 +84,6 @@ class Zhipin(object):
                 job_summary.description = info_desc
                 job_summary.id = self.__get__job_id(job_summary.link)
                 jobSummarys.append(job_summary)
-        print("jobSummarys count:", len(jobSummarys))
         return jobSummarys
 
     async def get_job(self, job_summary: JobSummary) -> Job:
@@ -99,6 +100,16 @@ class Zhipin(object):
         posted_date = await page.locator("p.gray").inner_text()
         job.posted_date = posted_date
         job.detail = detail
+        job.boss = Boss()
+        job.boss.title = self.__get__boss_title(
+            await page.locator(".job-boss-info .boss-info-attr").inner_text()
+        )
+        job.boss.name = self.__get__boss_name(
+            await page.locator(".job-boss-info .name").inner_text()
+        )
+        job.boss.active_state = await page.locator(
+            ".job-boss-info .boss-active-time"
+        ).inner_text()
         return job
 
     def __get__job_id(self, job_url):
@@ -106,3 +117,11 @@ class Zhipin(object):
         path = parsed_url.path.split("/")[-1].split("?")[0]
         job_id = path.split(".")[0]
         return job_id
+
+    def __get__boss_title(self, title):
+        parts = title.split("\n")[-1]
+        return parts
+
+    def __get__boss_name(self, name):
+        result = name.split("\n")[0]
+        return result

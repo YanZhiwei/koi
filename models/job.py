@@ -12,3 +12,4 @@ class Job:
     boss: Boss = None
     detail: str = ""
     posted_date: str = ""
+    boss: Boss = None

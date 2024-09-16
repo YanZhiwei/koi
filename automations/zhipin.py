@@ -1,8 +1,6 @@
 from typing import List
 
-from clicknium import clicknium as cc
-from clicknium import locator
-from clicknium.core.models.web.browsertab import BrowserTab
+from playwright.async_api import async_playwright
 
 from models.job import Job
 from models.job_summary import JobSummary
@@ -16,34 +14,52 @@ class Zhipin(object):
     ):
         self.url = "https://www.zhipin.com/"
         self.city = city
-        self.tab: BrowserTab = None
+        self.browser = None
 
     def __del__(self):
-        if self.tab is not None:
-            self.tab.close()
+        self.browser.close()
 
-    def __instance_browser(self) -> BrowserTab:
-        tab = cc.chrome.open(
-            "https://www.zhipin.com/",
+    async def __instance_browser(self):
+        p = await async_playwright().start()
+        self.browser = await p.chromium.launch(
+            executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            headless=False,
             args=["--disable-infobars"],
+            ignore_default_args=["--enable-automation"],
         )
-        return tab
 
-    def search(self, keyword: str) -> List[JobSummary]:
+    async def search(self, keyword: str) -> List[JobSummary]:
         jobSummarys: List[JobSummary] = []
-        # if not self.tab:
-        #     self.tab = self.__instance_browser()
-        # self.tab.find_element(locator.zhipin.input_search).set_text(keyword)
-        # self.tab.find_element(locator.zhipin.btn_search).click()
-        search_tab = cc.chrome.attach_by_title_url(
-            url=f"https://www.zhipin.com/web/geek/job*"
+        if not self.browser:
+            await self.__instance_browser()
+        page = await self.browser.new_page()
+        await page.goto(
+            "https://www.zhipin.com/shanghai/?seoRefer=index",
+            wait_until="domcontentloaded",
         )
-        print(search_tab.url)
-        result = search_tab.scrape_data(
-            locator.zhipin.search_result,
-            next_page_button_locator=locator.zhipin.btn_page_next,
-        )
-        print(result)
+        await page.type('[name="query"]', keyword)
+        await page.click(".btn-search")
+        await page.wait_for_selector(".job-list-box")
+        job_result = await page.locator(".job-list-box > li").all()
+        for job in job_result:
+            job_name = await job.locator(".job-name").inner_text()
+            job_area = await job.locator(".job-area").inner_text()
+            job_link = await job.locator(".job-card-left").get_attribute("href")
+            company_name = await job.locator(".company-name").inner_text()
+            info_desc = await job.locator(".info-desc").inner_text()
+            tag_list = await job.locator(".tag-list > li").all()
+            tags = []
+            for tag in tag_list:
+                tag_text = await tag.inner_text()
+                tags.append(tag_text)
+            job_summary = JobSummary()
+            job_summary.name = job_name
+            job_summary.area = job_area
+            job_summary.link = f"https://www.zhipin.com{job_link}"
+            job_summary.company = company_name
+            job_summary.tags = tags
+            job_summary.description = info_desc
+            jobSummarys.append(job_summary)
         return jobSummarys
 
     async def get_job(self, job_summary: JobSummary) -> Job:

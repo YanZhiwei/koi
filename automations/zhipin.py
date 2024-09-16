@@ -2,6 +2,7 @@ from typing import List
 
 from playwright.async_api import async_playwright
 
+from chrome import get_chrome_path_windows
 from models.job import Job
 from models.job_summary import JobSummary
 
@@ -20,9 +21,12 @@ class Zhipin(object):
         self.browser.close()
 
     async def __instance_browser(self):
+        chrome_path = get_chrome_path_windows()
+        if chrome_path is None:
+            raise Exception("chrome path not found")
         p = await async_playwright().start()
         self.browser = await p.chromium.launch(
-            executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            executable_path=chrome_path,
             headless=False,
             args=["--disable-infobars"],
             ignore_default_args=["--enable-automation"],

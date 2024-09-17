@@ -23,3 +23,7 @@ async def create_job(job: Job, db: Session = next(get_db())) -> JobSchema:
     db.commit()
     db.refresh(jobSchema)
     return jobSchema
+
+
+async def get_job(id: str, db: Session = next(get_db())) -> JobSchema:
+    return db.query(JobSchema).filter(JobSchema.id == id).first()

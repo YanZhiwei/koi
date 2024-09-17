@@ -87,30 +87,36 @@ class Zhipin(object):
 
     async def get_job(self, job_summary: JobSummary) -> Job:
         job: Job = Job()
+        job.summary = job_summary
         if not self.browser:
             await self.__instance_browser()
         page = await self.browser.new_page()
-        await page.goto(
-            job_summary.url,
-            wait_until="domcontentloaded",
-        )
-        await page.wait_for_selector(".job-detail")
-        detail = await page.locator(".job-sec-text:not(.fold-text)").inner_html()
-        posted_date = await page.locator("p.gray").inner_text()
-        job.posted_date = posted_date
-        job.detail = detail
-        job.boss = Boss()
-        job.boss.title = self.__get__boss_title(
-            await page.locator(".job-boss-info .boss-info-attr").inner_text()
-        )
-        job.boss.name = self.__get__boss_name(
-            await page.locator(".job-boss-info .name").inner_text()
-        )
-        job.boss.active_state = await page.locator(
-            ".job-boss-info .boss-active-time"
-        ).inner_text()
-        job.summary = job_summary
-        return job
+        try:
+            await page.goto(
+                job_summary.url,
+                wait_until="domcontentloaded",
+            )
+            await page.wait_for_selector(".job-detail")
+            detail = await page.locator(".job-sec-text:not(.fold-text)").inner_html()
+            posted_date = await page.locator("p.gray").inner_text()
+            job.posted_date = self.__get__job_posted_date(posted_date)
+            job.detail = detail
+            job.boss = Boss()
+            job.boss.title = self.__get__boss_title(
+                await page.locator(".job-boss-info .boss-info-attr").inner_text()
+            )
+            job.boss.name = self.__get__boss_name(
+                await page.locator(".job-boss-info .name").inner_text()
+            )
+            job.boss.active_state = await page.locator(
+                ".job-boss-info .boss-active-time"
+            ).inner_text()
+            return job
+        except Exception as e:
+            print(f"get job:{job_summary.id} failed,detail:{e}")
+            return job
+        finally:
+            await page.close()
 
     def __get__job_id(self, job_url):
         parsed_url = urlparse(job_url)
@@ -125,3 +131,7 @@ class Zhipin(object):
     def __get__boss_name(self, name):
         result = name.split("\n")[0]
         return result
+
+    def __get__job_posted_date(self, posted_date):
+        date_part = posted_date.split("：")[1]
+        return date_part

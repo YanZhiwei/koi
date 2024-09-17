@@ -1,4 +1,3 @@
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -6,7 +5,6 @@ from sqlalchemy.orm import Session
 from curd import job_curd
 from database.database import get_db
 from dtos.job_dto import JobDto
-from schemas import job_schema
 
 jobRouter = APIRouter(tags=["岗位相关"])
 

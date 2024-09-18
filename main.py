@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from apis.v1.Job import jobRouter
 from automations.zhipin import Zhipin
+from curd.job_boss_curd import create_job_boss
 from curd.job_curd import create_job, exists_job
 from database.database import engine, get_db
 from models.job_summary import JobSummary
@@ -49,6 +50,7 @@ async def main():
         if exist == False:
             job = await zhipin.get_job(job_summary)
             await create_job(job)
+            await create_job_boss(job)
 
 
 if __name__ == "__main__":

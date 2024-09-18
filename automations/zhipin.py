@@ -88,6 +88,7 @@ class Zhipin(object):
     async def get_job(self, job_summary: JobSummary) -> Job:
         job: Job = Job()
         job.summary = job_summary
+        job.id = job_summary.id
         if not self.browser:
             await self.__instance_browser()
         page = await self.browser.new_page()

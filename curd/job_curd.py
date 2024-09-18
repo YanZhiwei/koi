@@ -26,3 +26,7 @@ async def create_job(job: Job, db: Session = next(get_db())) -> JobSchema:
 
 async def get_job(id: str, db: Session = next(get_db())) -> JobSchema:
     return db.query(JobSchema).filter(JobSchema.id == id).first()
+
+
+async def exists_job(id: str, db: Session = next(get_db())) -> bool:
+    return db.query(JobSchema).filter(JobSchema.id == id).first() != None

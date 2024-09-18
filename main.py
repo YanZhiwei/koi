@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from apis.v1.Job import jobRouter
 from automations.zhipin import Zhipin
-from curd.job_curd import create_job
+from curd.job_curd import create_job, exists_job
 from database.database import engine, get_db
 from models.job_summary import JobSummary
 from schemas.base_schema import Base
@@ -45,11 +45,13 @@ async def main():
         # job_summary.company = "百度"
         # job_summary.id = "ece6ae88a5de57611XZy2dW-EVJZ"
         # job_summary = job_summary
-        job = await zhipin.get_job(job_summary)
-        await create_job(job)
+        exist = await exists_job(job_summary.id)
+        if exist == False:
+            job = await zhipin.get_job(job_summary)
+            await create_job(job)
 
 
 if __name__ == "__main__":
     Base.metadata.create_all(engine, tables=[Job.__table__, Job_Boss.__table__])
-    # asyncio.get_event_loop().run_until_complete(main())
+    asyncio.get_event_loop().run_until_complete(main())
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

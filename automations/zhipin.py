@@ -4,6 +4,7 @@ from typing import List
 from urllib.parse import urlparse
 
 from playwright.async_api import Page, async_playwright
+from playwright.sync_api import BrowserContext
 
 from chrome import get_chrome_path_windows
 from models.boss import Boss
@@ -20,6 +21,7 @@ class Zhipin(object):
         self.url = "https://www.zhipin.com/"
         self.city = city
         self.browser = None
+        self.context: BrowserContext = None
 
     async def __del__(self):
         await self.browser.close()
@@ -35,6 +37,7 @@ class Zhipin(object):
             args=["--disable-infobars"],
             ignore_default_args=["--enable-automation"],
         )
+        self.context = await self.browser.new_context()
 
     async def close_login_dialog_if_exists(self, page: Page):
         try:
@@ -47,7 +50,7 @@ class Zhipin(object):
         jobSummarys: List[JobSummary] = []
         if not self.browser:
             await self.__instance_browser()
-        page = await self.browser.new_page()
+        page = await self.context.new_page()
         await page.goto(
             "https://www.zhipin.com/shanghai/?seoRefer=index",
             wait_until="domcontentloaded",
@@ -93,7 +96,7 @@ class Zhipin(object):
         job.id = job_summary.id
         if not self.browser:
             await self.__instance_browser()
-        page = await self.browser.new_page()
+        page = await self.context.new_page()
 
         try:
             await page.goto(
@@ -101,6 +104,7 @@ class Zhipin(object):
                 wait_until="domcontentloaded",
             )
             await page.wait_for_selector(".job-detail")
+            await self.close_login_dialog_if_exists(page)
             detail = await page.locator(".job-sec-text:not(.fold-text)").inner_html()
             posted_date = await page.locator("p.gray").inner_text()
             job.posted_date = self.__get__job_posted_date(posted_date)

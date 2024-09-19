@@ -45,6 +45,7 @@ async def main():
             create_job(job)
             create_job_boss(job)
             add_jobs_count += 1
+            print(f"Job:{job_summary.id} added")
         else:
             print(f"Job:{job_summary.id} already exists")
             exists_job_count += 1

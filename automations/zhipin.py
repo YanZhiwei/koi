@@ -1,3 +1,5 @@
+import asyncio
+import random
 from typing import List
 from urllib.parse import urlparse
 
@@ -92,6 +94,7 @@ class Zhipin(object):
         if not self.browser:
             await self.__instance_browser()
         page = await self.browser.new_page()
+
         try:
             await page.goto(
                 job_summary.url,
@@ -117,6 +120,8 @@ class Zhipin(object):
             print(f"get job:{job_summary.id} failed,detail:{e}")
             return job
         finally:
+            sleep_time = random.randint(1, 10)
+            await asyncio.sleep(sleep_time)
             await page.close()
 
     def __get__job_id(self, job_url):

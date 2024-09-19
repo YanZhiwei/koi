@@ -34,14 +34,21 @@ async def welcome() -> dict:
 async def main():
     zhipin = Zhipin("北京")
     result = await zhipin.search("python")
+    count: int = len(result)
+    print(f"Found {count} jobs")
+    add_jobs_count: int = 0
+    exists_job_count: int = 0
     for job_summary in result:
         exist = exists_job(job_summary.id)
         if exist == False:
             job = await zhipin.get_job(job_summary)
             create_job(job)
             create_job_boss(job)
+            add_jobs_count += 1
         else:
             print(f"Job:{job_summary.id} already exists")
+            exists_job_count += 1
+    print(f"Added {add_jobs_count} jobs,exist:{exists_job_count} jobs")
 
 
 if __name__ == "__main__":

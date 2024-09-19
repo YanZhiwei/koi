@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -10,8 +9,8 @@ jobRouter = APIRouter(tags=["岗位相关"])
 
 
 @jobRouter.get("/job/{id}", response_model=JobDto, summary="根据id获取job详情")
-async def get_job(id: str, db: Session = Depends(get_db)):
-    job_schema = await job_curd.get_job(id, db)
+def get_job(id: str, db: Session = Depends(get_db)):
+    job_schema = job_curd.get_job(id, db)
     if job_schema is None:
         raise HTTPException(status_code=404, detail="Job not found")
     job_dto = JobDto(

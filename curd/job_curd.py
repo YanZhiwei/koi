@@ -5,7 +5,7 @@ from models.job import Job
 from schemas.job_schema import Job as JobSchema
 
 
-async def create_job(job: Job, db: Session = next(get_db())) -> JobSchema:
+def create_job(job: Job, db: Session = next(get_db())) -> JobSchema:
     jobSchema = JobSchema()
     jobSchema.id = job.summary.id
     jobSchema.name = job.summary.name
@@ -24,9 +24,9 @@ async def create_job(job: Job, db: Session = next(get_db())) -> JobSchema:
     return jobSchema
 
 
-async def get_job(id: str, db: Session = next(get_db())) -> JobSchema:
+def get_job(id: str, db: Session = next(get_db())) -> JobSchema:
     return db.query(JobSchema).filter(JobSchema.id == id).first()
 
 
-async def exists_job(id: str, db: Session = next(get_db())) -> bool:
+def exists_job(id: str, db: Session = next(get_db())) -> bool:
     return db.query(JobSchema).filter(JobSchema.id == id).first() != None

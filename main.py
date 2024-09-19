@@ -35,22 +35,13 @@ async def main():
     zhipin = Zhipin("北京")
     result = await zhipin.search("python")
     for job_summary in result:
-        # job_summary = JobSummary()
-        # job_summary.area = "北京"
-        # job_summary.url = (
-        #     "https://www.zhipin.com/job_detail/ece6ae88a5de57611XZy2dW-EVJZ.html"
-        # )
-        # job_summary.name = "Python编程老师"
-        # job_summary.tags = ["python"]
-        # job_summary.salary = "6k-8k"
-        # job_summary.company = "百度"
-        # job_summary.id = "ece6ae88a5de57611XZy2dW-EVJZ"
-        # job_summary = job_summary
-        exist = await exists_job(job_summary.id)
+        exist = exists_job(job_summary.id)
         if exist == False:
             job = await zhipin.get_job(job_summary)
-            await create_job(job)
-            await create_job_boss(job)
+            create_job(job)
+            create_job_boss(job)
+        else:
+            print(f"Job:{job_summary.id} already exists")
 
 
 if __name__ == "__main__":

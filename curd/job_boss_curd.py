@@ -5,7 +5,7 @@ from models.job import Job
 from schemas.job_boss_schema import Job_Boss as Job_Boss_Schema
 
 
-async def create_job_boss(job: Job, db: Session = next(get_db())) -> Job_Boss_Schema:
+def create_job_boss(job: Job, db: Session = next(get_db())) -> Job_Boss_Schema:
     job_Boss_Schema = Job_Boss_Schema()
     job_Boss_Schema.id = job.summary.id
     job_Boss_Schema.name = job.boss.name

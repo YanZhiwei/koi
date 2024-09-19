@@ -34,10 +34,10 @@ class Zhipin(object):
         self.browser = await p.chromium.launch(
             executable_path=chrome_path,
             headless=False,
-            args=["--disable-infobars"],
+            args=["--disable-infobars", "--start-maximized"],
             ignore_default_args=["--enable-automation"],
         )
-        self.context = await self.browser.new_context()
+        self.context = await self.browser.new_context(no_viewport=True)
 
     async def close_login_dialog_if_exists(self, page: Page):
         try:

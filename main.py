@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from apis.v1.Job import jobRouter
+from apis.v1.job import jobRouter
 from automations.zhipin import Zhipin
 from curd.job_boss_curd import create_job_boss
 from curd.job_curd import create_job, exists_job

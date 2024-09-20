@@ -106,7 +106,7 @@ class Zhipin(object):
             await page.wait_for_selector(".job-detail")
             await self.close_login_dialog_if_exists(page)
             detail = await page.locator(".job-sec-text:not(.fold-text)").inner_html()
-            posted_date = await page.locator("p.gray").inner_text()
+            posted_date = await page.locator("p.gray", has_text="更新于").inner_text()
             job.posted_date = self.__get__job_posted_date(posted_date)
             job.detail = detail
             job.boss = Boss()

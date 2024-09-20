@@ -12,6 +12,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from curd.job_curd import get_job
+from llm.chatModel import ChatModel
 
 
 class Resume(object):
@@ -77,11 +78,8 @@ class Resume(object):
 
 
 if __name__ == "__main__":
-    load_dotenv()
-    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-    model = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash", google_api_key=GOOGLE_API_KEY, verbose=True
-    )
+    chatModel = ChatModel(verbose=True)
+    model = chatModel.get()
     resume = Resume(model)
     resume_text = resume.read_resume()
     vectorstore = resume.get_vectorstore(resume_text)

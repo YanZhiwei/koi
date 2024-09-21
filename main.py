@@ -42,6 +42,9 @@ async def main():
         exist = exists_job(job_summary.id)
         if exist == False:
             job = await zhipin.get_job(job_summary)
+            if job.detail == None or job.detail == "":
+                print(f"Job:{job_summary.id} detail is empty")
+                continue
             create_job(job)
             create_job_boss(job)
             add_jobs_count += 1

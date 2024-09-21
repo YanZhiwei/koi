@@ -1,6 +1,5 @@
-from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from schemas.base_schema import Base

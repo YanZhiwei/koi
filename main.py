@@ -14,6 +14,7 @@ from models.job_summary import JobSummary
 from schemas.base_schema import Base
 from schemas.job_boss_schema import Job_Boss
 from schemas.job_schema import Job
+from schemas.rpa_task_schema import RpaTask
 
 app = FastAPI()
 
@@ -58,6 +59,8 @@ async def main():
 
 
 if __name__ == "__main__":
-    Base.metadata.create_all(engine, tables=[Job.__table__, Job_Boss.__table__])
-    asyncio.get_event_loop().run_until_complete(main())
+    Base.metadata.create_all(
+        engine, tables=[Job.__table__, Job_Boss.__table__, RpaTask.__table__]
+    )
+    # asyncio.get_event_loop().run_until_complete(main())
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

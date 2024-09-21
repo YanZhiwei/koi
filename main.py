@@ -1,4 +1,3 @@
-import asyncio
 
 import uvicorn
 from fastapi import FastAPI
@@ -9,8 +8,7 @@ from apis.v1.rpa import rpaRouter
 from automations.zhipin import Zhipin
 from curd.job_boss_curd import create_job_boss
 from curd.job_curd import create_job, exists_job
-from database.database import engine, get_db
-from models.job_summary import JobSummary
+from database.database import engine
 from schemas.base_schema import Base
 from schemas.job_boss_schema import Job_Boss
 from schemas.job_schema import Job

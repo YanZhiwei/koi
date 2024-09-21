@@ -1,15 +1,7 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import (
-    Column,
-    DateTime,
-    String,
-    Text,
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-)
+from sqlalchemy import Column, DateTime, String, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from schemas.base_schema import Base
 
@@ -18,9 +10,6 @@ class Job(Base):
     __tablename__ = "job"
     id: Mapped[str] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), index=True)
-    create_at: Mapped[DateTime] = mapped_column(
-        DateTime(), default=datetime.now(timezone.utc)
-    )
     url: Mapped[str] = mapped_column(String(256))
     company: Mapped[str] = mapped_column(String(100))
     area: Mapped[str] = mapped_column(String(100))

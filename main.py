@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from apis.v1.job import jobRouter
+from apis.v1.rpa import rpaRouter
 from automations.zhipin import Zhipin
 from curd.job_boss_curd import create_job_boss
 from curd.job_curd import create_job, exists_job
@@ -24,6 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(jobRouter)
+app.include_router(rpaRouter)
 
 
 @app.get("/")
@@ -57,5 +59,5 @@ async def main():
 
 if __name__ == "__main__":
     Base.metadata.create_all(engine, tables=[Job.__table__, Job_Boss.__table__])
-    asyncio.get_event_loop().run_until_complete(main())
+    # asyncio.get_event_loop().run_until_complete(main())
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

@@ -1,3 +1,4 @@
+import asyncio
 
 import uvicorn
 from fastapi import FastAPI
@@ -32,9 +33,9 @@ async def welcome() -> dict:
     return {"message": "Welcome to my Page"}
 
 
-async def main():
+def main():
     zhipin = Zhipin("北京")
-    result = await zhipin.search("python")
+    result = zhipin.search("python")
     count: int = len(result)
     print(f"Found {count} jobs")
     add_jobs_count: int = 0
@@ -42,7 +43,7 @@ async def main():
     for job_summary in result:
         exist = exists_job(job_summary.id)
         if exist == False:
-            job = await zhipin.get_job(job_summary)
+            job = zhipin.get_job(job_summary)
             if job.detail == None or job.detail == "":
                 print(f"Job:{job_summary.id} detail is empty")
                 continue
@@ -60,5 +61,5 @@ if __name__ == "__main__":
     Base.metadata.create_all(
         engine, tables=[Job.__table__, Job_Boss.__table__, RpaTask.__table__]
     )
-    # asyncio.get_event_loop().run_until_complete(main())
+    # main()
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from database.database import get_db
 from models.rpa_task import RpaTask
+from models.task_status import TaskStatus
 from schemas.rpa_task_schema import RpaTask as RpaTaskSchema
 
 
@@ -29,6 +30,18 @@ def create_rpa_task(rpa_task: RpaTask, db: Session = next(get_db())) -> RpaTaskS
     rpa_task_schema.data = rpa_task.data
     rpa_task_schema.id = rpa_task.id
     db.add(rpa_task_schema)
+    db.commit()
+    db.refresh(rpa_task_schema)
+    return rpa_task_schema
+
+
+def update_rpa_task_status(
+    task_id: str, status: TaskStatus, db: Session = next(get_db())
+) -> RpaTaskSchema:
+    rpa_task_schema = get_rpa_task(id=task_id, db=db)
+    if rpa_task_schema is None:
+        return None
+    rpa_task_schema.status = status
     db.commit()
     db.refresh(rpa_task_schema)
     return rpa_task_schema

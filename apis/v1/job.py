@@ -31,10 +31,11 @@ def get_job(id: str, db: Session = Depends(get_db)):
     return job_dto
 
 
-@jobRouter.post("/job", response_model=JobDto, summary="创建job")
+@jobRouter.post("/job", response_model=str, summary="创建job")
 def create_job(request: CreateJobRequest, db: Session = Depends(get_db)):
-    if job_curd.exists_job(request.id, db):
-        raise HTTPException(status_code=400, detail="Job already exists")
+    exist_job = job_curd.get_job(request.id, db)
+    if exist_job:
+        return exist_job.id
     job: Job = Job(**request.model_dump())
     job_schema = job_curd.create_job(job, db)
-    return job_schema
+    return job_schema.id

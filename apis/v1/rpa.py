@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Body, Depends
 from sqlalchemy.orm import Session
 
+from apis.v1.requests.create_rpa_task_request import CreateRpaTaskRequest
 from curd import rpa_task_curd
 from database.database import get_db
 from dtos.create_rpa_task_dto import CreateRpaTaskDto
 from models.rpa_task import RpaTask
-from requests.create_rpa_task_request import CreateRpaTaskRequest
 
 rpaRouter = APIRouter(tags=["RPA相关"])
 import uuid

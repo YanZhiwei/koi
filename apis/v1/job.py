@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from apis.v1.requests.create_job_request import CreateJobRequest
 from curd import job_curd
 from database.database import get_db
 from dtos.job_dto import JobDto
 from models.job import Job
-from requests.create_job_request import CreateJobRequest
 
 jobRouter = APIRouter(tags=["岗位相关"])
 

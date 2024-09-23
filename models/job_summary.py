@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 
-@dataclass(init=False)
+@dataclass()
 class JobSummary:
     id: str = ""
     name: str = ""

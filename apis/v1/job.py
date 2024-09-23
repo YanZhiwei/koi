@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from curd import job_curd
 from database.database import get_db
 from dtos.job_dto import JobDto
+from models.job import Job
+from requests.create_job_request import CreateJobRequest
 
 jobRouter = APIRouter(tags=["岗位相关"])
 
@@ -27,3 +29,12 @@ def get_job(id: str, db: Session = Depends(get_db)):
     )
 
     return job_dto
+
+
+@jobRouter.post("/job", response_model=JobDto, summary="创建job")
+def create_job(request: CreateJobRequest, db: Session = Depends(get_db)):
+    if job_curd.exists_job(request.id, db):
+        raise HTTPException(status_code=400, detail="Job already exists")
+    job: Job = Job(**request.model_dump())
+    job_schema = job_curd.create_job(job, db)
+    return job_schema

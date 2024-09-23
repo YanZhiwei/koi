@@ -11,4 +11,17 @@ class Job:
     boss: Boss = None
     detail: str = ""
     posted_date: str = ""
-    boss: Boss = None
+
+    def __init__(
+        self,
+        id: str = "",
+        summary: JobSummary = None,
+        boss: Boss = None,
+        detail: str = "",
+        posted_date: str = "",
+    ):
+        self.id = id
+        self.summary = summary
+        self.boss = boss
+        self.detail = detail
+        self.posted_date = posted_date

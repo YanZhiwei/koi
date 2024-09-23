@@ -1,4 +1,4 @@
-
+import spacy
 import torch
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate

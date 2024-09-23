@@ -6,7 +6,6 @@ from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from curd.job_curd import get_job
 from llm.chatModel import ChatModel
@@ -32,18 +31,23 @@ class Resume(object):
         # text_splitter = CharacterTextSplitter(
         #     separator="\n", chunk_size=100, chunk_overlap=30, length_function=len
         # )
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
+        # text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
+        nlp = spacy.load("zh_core_web_sm")
+        chunks = nlp(resume_text)
+        for ent in chunks.ents:
+            print(ent.text, ent.label_)
+        sentences = [sent.text for sent in chunks.sents]
         EMBEDDING_DEVICE = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if torch.backends.mps.is_available() else "cpu"
         )
-        chunks = text_splitter.split_text(resume_text)
+        # chunks = text_splitter.split_text(resume_text)
         embeddings = HuggingFaceEmbeddings(
             model_name="GanymedeNil/text2vec-large-chinese",
             model_kwargs={"device": EMBEDDING_DEVICE},
         )
-        vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
+        vectorstore = FAISS.from_texts(texts=sentences, embedding=embeddings)
         return vectorstore
 
     def get_self_introduction(

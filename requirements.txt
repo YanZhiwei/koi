@@ -90,6 +90,8 @@ pydantic_core==2.20.1
 pyee==11.1.0
 pyflakes==3.2.0
 Pygments==2.18.0
+PyMuPDF==1.24.10
+PyMuPDFb==1.24.10
 pyparsing==3.1.4
 pypdf==5.0.0
 python-dateutil==2.9.0.post0
@@ -112,6 +114,7 @@ sniffio==1.3.1
 spacy==3.7.6
 spacy-legacy==3.0.12
 spacy-loggers==1.0.5
+spacy-pkuseg==0.0.33
 SQLAlchemy==2.0.33
 srsly==2.4.8
 starlette==0.38.5
@@ -140,4 +143,5 @@ win32-setctime==1.1.0
 wrapt==1.16.0
 xxhash==3.5.0
 yarl==1.9.4
+zh-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/zh_core_web_sm-3.7.0/zh_core_web_sm-3.7.0-py3-none-any.whl#sha256=f51075665749e07406d629d1055ce5a68635fae6ab3c34257ee798c62b4fc431
 zipp==3.20.1

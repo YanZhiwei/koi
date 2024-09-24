@@ -6,6 +6,7 @@ from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
 
 from curd.job_curd import get_job
 from llm.chatModel import ChatModel
@@ -28,26 +29,26 @@ class Resume(object):
         return resume_text
 
     def get_vectorstore(self, resume_text: str):
-        # text_splitter = CharacterTextSplitter(
-        #     separator="\n", chunk_size=100, chunk_overlap=30, length_function=len
-        # )
-        # text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
-        nlp = spacy.load("zh_core_web_sm")
-        chunks = nlp(resume_text)
-        for ent in chunks.ents:
-            print(ent.text, ent.label_)
-        sentences = [sent.text for sent in chunks.sents]
+        text_splitter = CharacterTextSplitter(
+            separator="\n\n",
+            chunk_size=1200,
+            chunk_overlap=100,
+            length_function=len,
+            is_separator_regex=False,
+        )
+        chunks = text_splitter.split_text(resume_text)
+        for chunk in chunks:
+            print(chunk)
         EMBEDDING_DEVICE = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if torch.backends.mps.is_available() else "cpu"
         )
-        # chunks = text_splitter.split_text(resume_text)
         embeddings = HuggingFaceEmbeddings(
             model_name="GanymedeNil/text2vec-large-chinese",
             model_kwargs={"device": EMBEDDING_DEVICE},
         )
-        vectorstore = FAISS.from_texts(texts=sentences, embedding=embeddings)
+        vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
         return vectorstore
 
     def get_self_introduction(
@@ -59,7 +60,7 @@ class Resume(object):
     ) -> str:
         prompt_template = (
             f"""
-        你将扮演一位求职者的角色,正在应聘：{job_title}岗位,根据上下文里的简历内容以及应聘工作的描述,来直接给HR写一个礼貌专业, 且字数严格限制在{character_limit}以内的求职消息,要求能够用专业的语言结合简历中的经历和技能,并结合应聘工作的描述,来阐述自己的优势,尽最大可能打动招聘者。始终使用中文来进行消息的编写。开头是招聘负责人, 结尾附上求职者联系方式。这是一份求职消息，不要包含求职内容以外的东西,例如“根据您上传的求职要求和个人简历,我来帮您起草一封求职邮件：”这一类的内容，以便于我直接自动化复制粘贴发送。
+        你将扮演一位求职者的角色,正在应聘：{job_title}岗位,根据上下文里的简历内容以及应聘工作的描述,来直接给HR写一个礼貌专业, 且字数严格限制在{character_limit}以内的求职消息,要求能够用专业的语言结合简历中的经历和技能,并结合应聘工作的描述,来阐述自己的优势,尽最大可能打动招聘者。始终使用中文来进行消息的编写,开发技能不要出现精通字眼,工作描述中要求开发技能如果不匹配则忽略。开头是招聘负责人,这是一份求职消息，不要包含求职内容以外的东西。,例如“根据您上传的求职要求和个人简历,我来帮您起草一封求职邮件：”这一类的内容，以便于我直接自动化复制粘贴发送。
         工作描述
         {job_description}"""
             + """
@@ -74,12 +75,12 @@ class Resume(object):
         chain = RetrievalQA.from_chain_type(
             self.model,
             retriever=vectorstore.as_retriever(),
-            # return_source_documents=True,
+            return_source_documents=False,
             chain_type_kwargs={"prompt": prompt},
         )
         result = chain.invoke({"query": question})
         letter = result["result"]
-        return letter
+        return letter.replace("\n", " ")
 
 
 if __name__ == "__main__":
@@ -88,6 +89,6 @@ if __name__ == "__main__":
     resume = Resume(model)
     resume_text = resume.read_resume()
     vectorstore = resume.get_vectorstore(resume_text)
-    job = get_job("ce9c1423459a5c131Xdy2ty-E1ZU")
+    job = get_job("9bd8100aa7981eea1HB739i4F1BU")
     letter = resume.get_self_introduction(vectorstore, job.name, job.detail)
     print(letter)

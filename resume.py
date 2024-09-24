@@ -51,17 +51,21 @@ class Resume(object):
         return vectorstore
 
     def get_self_introduction(
-        self, vectorstore, job_description: str, character_limit: int = 300
+        self,
+        vectorstore,
+        job_title: str,
+        job_description: str,
+        character_limit: int = 300,
     ) -> str:
         prompt_template = (
             f"""
-        你将扮演一位求职者的角色,根据上下文里的简历内容以及应聘工作的描述,来直接给HR写一个礼貌专业, 且字数严格限制在{character_limit}以内的求职消息,要求根据简历内容中专业技能，工作经验，项目经验来结合应聘工作的描述,来阐述自己的优势,尽最大可能打动招聘者。始终使用中文来进行消息的编写。开头是招聘负责人,这是一份求职消息，不要包含简历内容以外的技术的东西，专业技能和经验，不要引用简历内容，如果招聘要求技能在简历内容中不存在则忽略。
+        你将扮演一位求职者的角色,正在应聘：{job_title}岗位,根据上下文里的简历内容以及应聘工作的描述,来直接给HR写一个礼貌专业, 且字数严格限制在{character_limit}以内的求职消息,要求能够用专业的语言结合简历中的经历和技能,并结合应聘工作的描述,来阐述自己的优势,尽最大可能打动招聘者。始终使用中文来进行消息的编写。开头是招聘负责人, 结尾附上求职者联系方式。这是一份求职消息，不要包含求职内容以外的东西,例如“根据您上传的求职要求和个人简历,我来帮您起草一封求职邮件：”这一类的内容，以便于我直接自动化复制粘贴发送。
         工作描述
         {job_description}"""
             + """
         简历内容:
         {context}
-        招聘要求:
+        要求:
         {question} 
     """
         )
@@ -84,6 +88,6 @@ if __name__ == "__main__":
     resume = Resume(model)
     resume_text = resume.read_resume()
     vectorstore = resume.get_vectorstore(resume_text)
-    job = get_job("7412caa0a7a94cd41HJ92dy1FFNX")
-    letter = resume.get_self_introduction(vectorstore, job.detail)
+    job = get_job("ce9c1423459a5c131Xdy2ty-E1ZU")
+    letter = resume.get_self_introduction(vectorstore, job.name, job.detail)
     print(letter)

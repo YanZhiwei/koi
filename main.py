@@ -1,9 +1,11 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from loguru import logger
 
 from apis.v1.job import jobRouter
 from apis.v1.rpa import rpaRouter
+from conf.config import log_configs
 from database.database import engine
 from schemas.base_schema import Base
 from schemas.job_boss_schema import Job_Boss
@@ -29,6 +31,8 @@ async def welcome() -> dict:
 
 
 if __name__ == "__main__":
+    logger.configure(**log_configs)
+    logger.warning("hello world")
     Base.metadata.create_all(
         engine, tables=[Job.__table__, Job_Boss.__table__, RpaTask.__table__]
     )

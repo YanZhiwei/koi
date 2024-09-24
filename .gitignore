@@ -165,3 +165,6 @@ cython_debug/
 koi_app.db
 .env
 resume/*.pdf
+
+# Ignore dynaconf secret files
+.secrets.*

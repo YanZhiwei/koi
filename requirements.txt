@@ -20,6 +20,7 @@ dataclasses-json==0.6.7
 datasets==3.0.0
 dill==0.3.8
 distro==1.9.0
+dynaconf==3.2.6
 faiss-cpu==1.8.0.post1
 fastapi==0.114.2
 filelock==3.16.1

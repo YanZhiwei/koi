@@ -27,8 +27,8 @@ filelock==3.16.1
 frozenlist==1.4.1
 fsspec==2024.6.1
 google-ai-generativelanguage==0.6.6
-google-api-core==2.19.2
-google-api-python-client==2.146.0
+google-api-core==2.20.0
+google-api-python-client==2.147.0
 google-auth==2.34.0
 google-auth-httplib2==0.2.0
 google-generativeai==0.7.2
@@ -72,7 +72,7 @@ murmurhash==1.0.10
 mypy-extensions==1.0.0
 networkx==3.3
 numpy==1.26.4
-openai==1.47.0
+openai==1.47.1
 orjson==3.10.7
 packaging==24.1
 pandas==2.2.2
@@ -116,7 +116,7 @@ spacy==3.7.6
 spacy-legacy==3.0.12
 spacy-loggers==1.0.5
 spacy-pkuseg==0.0.33
-SQLAlchemy==2.0.33
+SQLAlchemy==2.0.35
 srsly==2.4.8
 starlette==0.38.5
 sympy==1.13.2

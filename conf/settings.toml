@@ -6,3 +6,4 @@ log_path = "@format /var/log/{this.PROJECT_NAME}/app.log"
 host = "0.0.0.0"
 port = 9088
 snowflake_datacenter_id = 0  # 雪花算法生成时的数据中心id,只支持0/1
+sqlalchemy_database_url = "sqlite:///./koi_app.db"

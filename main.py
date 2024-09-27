@@ -4,13 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from apis.v1.job import jobRouter
-from apis.v1.rpa import rpaRouter
 from conf.config import log_configs
 from database.database import engine
-from schemas.base_schema import Base
-from schemas.job_boss_schema import Job_Boss
-from schemas.job_schema import Job
-from schemas.rpa_task_schema import RpaTask
+from schema.base_schema import ModelBase
+from schema.job_boss_schema import Job_Boss
+from schema.job_schema import Job
 
 app = FastAPI()
 
@@ -22,7 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(jobRouter)
-app.include_router(rpaRouter)
 
 
 @app.get("/")
@@ -32,8 +29,8 @@ async def welcome() -> dict:
 
 if __name__ == "__main__":
     logger.configure(**log_configs)
-    logger.warning("hello world")
-    Base.metadata.create_all(
-        engine, tables=[Job.__table__, Job_Boss.__table__, RpaTask.__table__]
+    ModelBase.metadata.create_all(
+        engine, tables=[Job.__table__, Job_Boss.__table__]
     )
+    logger.info("Database created")
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

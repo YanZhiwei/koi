@@ -11,11 +11,12 @@ from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from curd.job_curd import get_job
+from manager.job import Job as JobManager
 
 
 def main():
-    job = get_job("7412caa0a7a94cd41HJ92dy1FFNX")
+    manager = JobManager()
+    job = manager.get_job("7412caa0a7a94cd41HJ92dy1FFNX")
     EMBEDDING_DEVICE = (
         "cuda"
         if torch.cuda.is_available()

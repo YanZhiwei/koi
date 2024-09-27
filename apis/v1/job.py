@@ -1,41 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, status
 
-from apis.v1.requests.create_job_request import CreateJobRequest
-from curd import job_curd
-from database.database import get_db
-from dtos.job_dto import JobDto
-from models.job import Job
+from manager.job import Job as JobManager
+from requests.job__create_request import CreateJobRequest
+from respones.generic_response import GenericResponse
+from schema.job_schema import Job
 
-jobRouter = APIRouter(tags=["岗位相关"])
+jobRouter = APIRouter(prefix="/jobs",tags=["岗位相关"])
 
 
-@jobRouter.get("/job/{id}", response_model=JobDto, summary="根据id获取job详情")
-def get_job(id: str, db: Session = Depends(get_db)):
-    job_schema = job_curd.get_job(id, db)
-    if job_schema is None:
-        raise HTTPException(status_code=404, detail="Job not found")
-    job_dto = JobDto(
-        id=job_schema.id,
-        name=job_schema.name,
-        url=job_schema.url,
-        salary=job_schema.salary,
-        posted_date=job_schema.posted_date,
-        area=job_schema.area,
-        tags=job_schema.tags,
-        detail=job_schema.detail,
-        company=job_schema.company,
-        language=job_schema.language,
-    )
-
-    return job_dto
+@jobRouter.get("/{id}", response_model=GenericResponse[Job], summary="根据id获取job详情")
+def get_job(id: str):
+    manager = JobManager()
+    job=manager.get_job(id)
+    return GenericResponse[Job](data=job)
 
 
-@jobRouter.post("/job", response_model=str, summary="创建job")
-def create_job(request: CreateJobRequest, db: Session = Depends(get_db)):
-    exist_job = job_curd.get_job(request.id, db)
-    if exist_job:
-        return exist_job.id
-    job: Job = Job(**request.model_dump())
-    job_schema = job_curd.create_job(job, db)
-    return job_schema.id
+@jobRouter.post("/", status_code=status.HTTP_201_CREATED, response_model=GenericResponse[Job], summary="创建job")
+def create_job(request: CreateJobRequest):
+    manager = JobManager()
+    job=manager.create_job(request)
+    return GenericResponse[Job](data=job)

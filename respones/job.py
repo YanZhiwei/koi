@@ -14,7 +14,7 @@ class JobDetail(BaseModel, metaclass=SchemaMetaclass):
     company: str=Field(max_length=255)
     area: str=Field(max_length=255)
     salary:  str=Field(max_length=32)
-    tags:  str=Field(max_length=64)
+    tags:  str=Field(max_length=255)
     search_keywords: str=Field(max_length=255)
     detail:  str=Field()
     posted_date: str=Field(max_length=32)

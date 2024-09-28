@@ -16,7 +16,7 @@ class JobDetail(BaseModel, metaclass=SchemaMetaclass):
     salary:  str=Field(max_length=32)
     tags:  str=Field(max_length=64)
     search_keywords: str=Field(max_length=255)
-    detail:  str=Field(max_length=2000)
+    detail:  str=Field()
     posted_date: str=Field(max_length=32)
     created_at: Optional[datetime] = Field()
     updated_at: Optional[datetime] = Field()

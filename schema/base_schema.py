@@ -54,7 +54,7 @@ class ModelDB(object):
     @classmethod
     def get_by_id(cls, uuid):
         with Session() as session:
-            query = select(cls).where(getattr(cls, "uuid") == uuid)
+            query = select(cls).where(getattr(cls, "id") == uuid)
             return session.execute(query).scalars().one_or_none()
 
     @classmethod

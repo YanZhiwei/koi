@@ -1,7 +1,8 @@
-import spacy
 import torch
 from langchain.chains import RetrievalQA
+from langchain.embeddings import CacheBackedEmbeddings
 from langchain.prompts import PromptTemplate
+from langchain.storage import LocalFileStore
 from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -10,6 +11,7 @@ from langchain_text_splitters import CharacterTextSplitter
 
 from llm.chatModel import ChatModel
 from manager.job import Job as JobManager
+from models.job import Job as DB_Job_Model
 
 
 class Resume(object):
@@ -28,7 +30,7 @@ class Resume(object):
 
         return resume_text
 
-    def get_vectorstore(self, resume_text: str):
+    def get_vectorstore(self,resume_key:str, resume_text: str):
         text_splitter = CharacterTextSplitter(
             separator="\n\n",
             chunk_size=1200,
@@ -37,32 +39,36 @@ class Resume(object):
             is_separator_regex=False,
         )
         chunks = text_splitter.split_text(resume_text)
-        for chunk in chunks:
-            print(chunk)
+        # for chunk in chunks:
+        #     print(chunk)
         EMBEDDING_DEVICE = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if torch.backends.mps.is_available() else "cpu"
         )
+        store = LocalFileStore("./cache/")
         embeddings = HuggingFaceEmbeddings(
             model_name="moka-ai/m3e-base",
             model_kwargs={"device": EMBEDDING_DEVICE},
         )
-        vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
+        cached_embedder = CacheBackedEmbeddings.from_bytes_store(
+        embeddings, store, namespace=resume_key
+    )
+
+        vectorstore = FAISS.from_texts(texts=chunks, embedding=cached_embedder)
         return vectorstore
 
     def get_self_introduction(
         self,
         vectorstore,
-        job_title: str,
-        job_description: str,
+        job:DB_Job_Model,
         character_limit: int = 300,
     ) -> str:
         prompt_template = (
             f"""
-        你将扮演一位求职者的角色,正在应聘：{job_title}岗位,根据上下文里的简历内容以及应聘工作的描述,来直接给HR写一个礼貌专业, 且字数严格限制在{character_limit}以内的求职消息,要求能够用专业的语言结合简历中的经历和技能,并结合应聘工作的描述,来阐述自己的优势,尽最大可能打动招聘者。始终使用中文来进行消息的编写,开发技能不要出现精通字眼,工作描述中要求开发技能如果不匹配则忽略。开头是招聘负责人,这是一份求职消息，不要包含求职内容以外的东西。,例如“根据您上传的求职要求和个人简历,我来帮您起草一封求职邮件：”这一类的内容，以便于我直接自动化复制粘贴发送。
+        你将扮演一位求职者的角色,正在应聘：{job.title}岗位,根据上下文里的简历内容以及应聘工作的描述,来直接给HR写一个礼貌专业, 且字数严格限制在{character_limit}以内的求职消息,要求能够用专业的语言结合简历中的经历和技能,并结合应聘工作的描述,来阐述自己的优势,尽最大可能打动招聘者。始终使用中文来进行消息的编写,开发技能不要出现精通字眼,工作描述中要求开发技能如果不匹配则忽略。开头是招聘负责人,这是一份求职消息，不要包含求职内容以外的东西。,例如“根据您上传的求职要求和个人简历,我来帮您起草一封求职邮件：”这一类的内容，以便于我直接自动化复制粘贴发送。
         工作描述
-        {job_description}"""
+        {job.detail}"""
             + """
         简历内容:
         {context}
@@ -88,8 +94,8 @@ if __name__ == "__main__":
     model = chatModel.get()
     resume = Resume(model)
     resume_text = resume.read_resume()
-    vectorstore = resume.get_vectorstore(resume_text)
+    vectorstore = resume.get_vectorstore("yanzhiwei",resume_text)
     manager=JobManager()
     job = manager.get_job("9bd8100aa7981eea1HB739i4F1BU")
-    letter = resume.get_self_introduction(vectorstore, job.title, job.detail)
+    letter = resume.get_self_introduction(vectorstore, job)
     print(letter)

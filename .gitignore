@@ -168,3 +168,4 @@ resume/*.pdf
 
 # Ignore dynaconf secret files
 .secrets.*
+/cache/

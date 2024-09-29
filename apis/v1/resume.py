@@ -3,7 +3,7 @@ from fastapi import APIRouter, status
 from llm.chatModel import ChatModel
 from manager.job import Job as JobManager
 from respones.generic_response import GenericResponse
-from resume import Resume
+from manager.resume import Resume
 
 resumeRouter = APIRouter(prefix="/resumes",tags=["简历相关"])
 

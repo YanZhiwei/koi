@@ -1,7 +1,7 @@
 from exception.job import JobNotFountException
-from requests.job__create_request import CreateJobRequest
-from schema.job_boss_schema import Job_Boss as DB_Job_Boss_Schema
-from schema.job_schema import Job as DB_Job_Schema
+from schemas.job__create import CreateJobRequest
+from models.job_boss import Job_Boss as DB_Job_Boss_Schema
+from models.job import Job as DB_Job_Schema
 
 
 class Job(object):

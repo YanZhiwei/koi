@@ -1,7 +1,7 @@
 
 from sqlalchemy import Column, String
 
-from schema.base_schema import ModelBase, ModelDB
+from models.model_base import ModelBase, ModelDB
 
 
 class Job_Boss(ModelBase, ModelDB):

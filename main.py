@@ -6,9 +6,9 @@ from loguru import logger
 from apis.v1.job import jobRouter
 from conf.config import log_configs
 from database.database import engine
-from schema.base_schema import ModelBase
-from schema.job_boss_schema import Job_Boss
-from schema.job_schema import Job
+from models.model_base import ModelBase
+from models.job_boss import Job_Boss
+from models.job import Job
 
 app = FastAPI()
 

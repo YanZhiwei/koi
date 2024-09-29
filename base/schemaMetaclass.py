@@ -1,23 +1,24 @@
-from pydantic.main import ModelMetaclass
+from typing import Any
+
+from pydantic import BaseModel
 
 
-class SchemaMetaclass(ModelMetaclass):
-    def __new__(mcs, name, bases, attrs):
-        schema_attrs = attrs["__annotations__"]
-        model_attrs = get_orm_model_recursive(attrs, bases)
-        if not model_attrs:
-            return ModelMetaclass.__new__(mcs, name, bases, attrs)
-        for key in schema_attrs:
-            if not hasattr(model_attrs, key):
-                continue
-            model_attr = getattr(model_attrs, key)
-            schema_attr_field = attrs.get(key)
-            if schema_attr_field.description:
-                description = schema_attr_field.description + "<br/>" + model_attr.property.columns[0].comment
-            else:
-                description = model_attr.property.columns[0].comment
-            setattr(schema_attr_field, "description", description)
-        return ModelMetaclass.__new__(mcs, name, bases, attrs)
+class SchemaMetaclass(BaseModel):
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        # 获取 ORM 模型属性
+        model_attrs = get_orm_model_recursive(self.__class__.__annotations__, self.__class__.__bases__)
+        if model_attrs:
+            for key, schema_attr_field in self.__annotations__.items():
+                if hasattr(model_attrs, key):
+                    model_attr = getattr(model_attrs, key)
+                    if hasattr(self.__fields__[key], 'field_info'):
+                        field_info = self.__fields__[key].field_info
+                        # 更新 description，使用 ORM 模型中的评论信息
+                        description = (
+                            (field_info.description or "") + "<br/>" + model_attr.property.columns[0].comment
+                        ) if hasattr(model_attr.property.columns[0], 'comment') else field_info.description
+                        self.__fields__[key].field_info.description = description
     
 def get_orm_model_recursive(current_attrs, current_bases):
     if current_attrs.get("Config"):

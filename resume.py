@@ -8,8 +8,8 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 
-from curd.job_curd import get_job
 from llm.chatModel import ChatModel
+from manager.job import Job as JobManager
 
 
 class Resume(object):
@@ -45,7 +45,7 @@ class Resume(object):
             else "mps" if torch.backends.mps.is_available() else "cpu"
         )
         embeddings = HuggingFaceEmbeddings(
-            model_name="GanymedeNil/text2vec-large-chinese",
+            model_name="moka-ai/m3e-base",
             model_kwargs={"device": EMBEDDING_DEVICE},
         )
         vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
@@ -89,6 +89,7 @@ if __name__ == "__main__":
     resume = Resume(model)
     resume_text = resume.read_resume()
     vectorstore = resume.get_vectorstore(resume_text)
-    job = get_job("9bd8100aa7981eea1HB739i4F1BU")
-    letter = resume.get_self_introduction(vectorstore, job.name, job.detail)
+    manager=JobManager()
+    job = manager.get_job("9bd8100aa7981eea1HB739i4F1BU")
+    letter = resume.get_self_introduction(vectorstore, job.title, job.detail)
     print(letter)

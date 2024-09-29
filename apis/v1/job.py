@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status
 
 from manager.job import Job as JobManager
-from requests.job__create_request import CreateJobRequest
+from schemas.job__create import CreateJobRequest
 from respones.generic_response import GenericResponse
 from respones.job import JobDetail
-from schema.job_schema import Job
+from models.job import Job
 
 jobRouter = APIRouter(prefix="/jobs",tags=["岗位相关"])
 
@@ -20,5 +20,5 @@ def get_job(id: str):
                         status.HTTP_409_CONFLICT: {"model": GenericResponse}}, summary="创建job")
 def create_job(request: CreateJobRequest):
     manager = JobManager()
-    job=manager.create_job(request)
-    return GenericResponse[JobDetail](data=job)
+    job_object=manager.create_job(request)
+    return GenericResponse[JobDetail](data=job_object)

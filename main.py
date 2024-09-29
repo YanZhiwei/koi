@@ -4,11 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from apis.v1.job import jobRouter
+from apis.v1.resume import resumeRouter
 from conf.config import log_configs
 from database.database import engine
-from models.model_base import ModelBase
-from models.job_boss import Job_Boss
 from models.job import Job
+from models.job_boss import Job_Boss
+from models.model_base import ModelBase
 
 app = FastAPI()
 
@@ -20,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(jobRouter)
-
+app.include_router(resumeRouter)
 
 @app.get("/")
 async def welcome() -> dict:

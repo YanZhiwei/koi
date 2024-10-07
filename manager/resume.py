@@ -1,9 +1,12 @@
+import hashlib
+from os import path
+
 import torch
 from langchain.chains import RetrievalQA
+from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.storage import LocalFileStore
-from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -15,47 +18,46 @@ from models.job import Job as DB_Job_Model
 
 
 class Resume(object):
-    def __init__(self, model: BaseChatModel):
+    def __init__(self ,model: BaseChatModel,resume_pdf:str):
         self.model = model
+        self.resume_pdf=resume_pdf
+        if(self.resume_pdf is None):
+            raise Exception("resume_pdf is None")
+        self.resume_pdf_path = "./resume/" +self.resume_pdf
+        if path.exists(self.resume_pdf_path) == False:
+            raise Exception(f"{self.resume_pdf_path} not exists")
+        self.key= hashlib.sha256(resume_pdf.encode()).hexdigest()[:32]
+        
 
     def read_resume(self):
-        loader = DirectoryLoader("./resume", glob="*.pdf", loader_cls=PyPDFLoader)
-        pdf_pages = loader.load()
+        pdf_loader = PyPDFLoader(file_path=self.resume_pdf_path)
+        pdf_pages = pdf_loader.load()
         resume_text = ""
         for page in pdf_pages:
             # print(page.metadata.get('source'))
-
             page_text = page.page_content
             resume_text += page_text
 
         return resume_text
 
-    def get_vectorstore(self,resume_key:str, resume_text: str):
-        text_splitter = CharacterTextSplitter(
-            separator="\n\n",
-            chunk_size=1200,
-            chunk_overlap=100,
-            length_function=len,
-            is_separator_regex=False,
-        )
-        chunks = text_splitter.split_text(resume_text)
-        # for chunk in chunks:
-        #     print(chunk)
+    def get_vectorstore(self):
+        vectorstore_key= f"./cache/resume/{self.key}"
         EMBEDDING_DEVICE = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if torch.backends.mps.is_available() else "cpu"
         )
-        store = LocalFileStore("./cache/")
         embeddings = HuggingFaceEmbeddings(
             model_name="moka-ai/m3e-base",
             model_kwargs={"device": EMBEDDING_DEVICE},
         )
-        cached_embedder = CacheBackedEmbeddings.from_bytes_store(
-        embeddings, store, namespace=resume_key
-    )
-
-        vectorstore = FAISS.from_texts(texts=chunks, embedding=cached_embedder)
+        if path.exists(vectorstore_key):
+            return FAISS.load_local(vectorstore_key, embeddings, allow_dangerous_deserialization=True)
+        resume_text = self.read_resume()
+        text_splitter = CharacterTextSplitter(separator="\n\n",chunk_size=1200,chunk_overlap=100,length_function=len,is_separator_regex=False)
+        chunks = text_splitter.split_text(resume_text)
+        vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
+        vectorstore.save_local(vectorstore_key)
         return vectorstore
 
     def get_self_introduction(
@@ -92,9 +94,8 @@ class Resume(object):
 if __name__ == "__main__":
     chatModel = ChatModel(verbose=True)
     model = chatModel.get()
-    resume = Resume(model)
-    resume_text = resume.read_resume()
-    vectorstore = resume.get_vectorstore("yanzhiwei",resume_text)
+    resume = Resume(model,"2024-言志伟-研发简历.pdf")
+    vectorstore = resume.get_vectorstore()
     manager=JobManager()
     job = manager.get_job("9bd8100aa7981eea1HB739i4F1BU")
     letter = resume.get_self_introduction(vectorstore, job)

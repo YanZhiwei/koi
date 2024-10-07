@@ -84,13 +84,12 @@ async def async_job():
         job_manager=JobManager()
         chatModel = ChatModel(verbose=True)
         model = chatModel.get()
-        resume = Resume(model)
-        resume_text = resume.read_resume()
-        vectorstore = resume.get_vectorstore("yanzhiwei",resume_text)
+        resume = Resume(model,"2024-言志伟-研发简历.pdf")
+        vectorstore = resume.get_vectorstore()
         unchat_jobs=job_manager.get_unchat_jobs()
         for job in unchat_jobs:
             try:
-                id=f'{job.id}_yanzhiwei'
+                id=f'{resume.key}_{job.id}'
                 if chat_manager.exist_job_chat(job.id)==False:
                     job = job_manager.get_job(job.id)
                     letter = resume.get_self_introduction(vectorstore, job)

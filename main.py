@@ -9,7 +9,7 @@ from conf.config import log_configs
 from database.database import engine
 from models.job import Job
 from models.job_boss import Job_Boss
-from models.job_embedding import Job_Embedding
+from models.job_chat import Job_Chat
 from models.model_base import ModelBase
 
 app = FastAPI()
@@ -32,7 +32,7 @@ async def welcome() -> dict:
 if __name__ == "__main__":
     logger.configure(**log_configs)
     ModelBase.metadata.create_all(
-        engine, tables=[Job.__table__, Job_Boss.__table__,Job_Embedding.__table__]
+        engine, tables=[Job.__table__, Job_Boss.__table__,Job_Chat.__table__]
     )
     logger.info("Database created")
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

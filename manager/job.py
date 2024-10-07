@@ -35,8 +35,8 @@ class Job(object):
             raise JobNotFountException(message="job %s not found." % id)
         return job
     
-    def get_unchat_jobs(self)->list[DB_Job]:
-        chat_jobs = DB_Job_Chat.get_all()
+    def get_unchat_jobs(self,resume_id:str)->list[DB_Job]:
+        chat_jobs = DB_Job_Chat.get_by_conditions(resume_id=resume_id)
         jobs=DB_Job.get_all()
         chat_job_ids=[chat_job.job_id for chat_job in chat_jobs]
         return [job for job in jobs if job.id not in chat_job_ids]

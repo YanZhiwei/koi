@@ -11,6 +11,7 @@ class Job_Chat(object):
         job_chat.model_name=request.model_name
         job_chat.resume_name=request.resume_name
         job_chat.self_introduce=request.self_introduce
+        job_chat.resume_id=request.resume_id
         job_chat.add()
         return 
     

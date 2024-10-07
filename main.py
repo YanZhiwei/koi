@@ -86,7 +86,7 @@ async def async_job():
         model = chatModel.get()
         resume = Resume(model,"2024-言志伟-研发简历.pdf")
         vectorstore = resume.get_vectorstore()
-        unchat_jobs=job_manager.get_unchat_jobs()
+        unchat_jobs=job_manager.get_unchat_jobs(resume.key)
         for job in unchat_jobs:
             try:
                 id=f'{resume.key}_{job.id}'
@@ -98,7 +98,8 @@ async def async_job():
                             job_id=job.id,
                             model_name=json.dumps( model.model_config,ensure_ascii=False),
                             id=id,
-                            resume_name="yanzhiwei",
+                            resume_id=resume.key,
+                            resume_name=resume.resume_pdf,
                             self_introduce=letter,
                         )
                     )

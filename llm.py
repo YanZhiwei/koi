@@ -1,3 +1,4 @@
+import json
 import os
 
 import torch
@@ -16,25 +17,26 @@ from manager.job import Job as JobManager
 
 def main():
     manager = JobManager()
-    job = manager.get_job("7412caa0a7a94cd41HJ92dy1FFNX")
+    job = manager.get_job("4acc74496348f6ba1nZ50ty5EFdQ")
+    job_json=json.dumps(job.as_dict(),ensure_ascii=False) 
     EMBEDDING_DEVICE = (
         "cuda"
         if torch.cuda.is_available()
         else "mps" if torch.backends.mps.is_available() else "cpu"
     )
     embeddings = HuggingFaceEmbeddings(
-        model_name="GanymedeNil/text2vec-large-chinese",
+        model_name="moka-ai/m3e-base",
         model_kwargs={"device": EMBEDDING_DEVICE},
     )
-    faiss_db_path = "faiss_job_vector_store"
+    faiss_db_path = f"./cache/job/{job.id}"
     if not os.path.exists(faiss_db_path):
         print("FAISS vector database not found. Creating and saving...")
         splitter = CharacterTextSplitter(
-            separator="<br>", chunk_size=20, chunk_overlap=0
+            separator=",", chunk_size=200, chunk_overlap=50
         )
-        splits = splitter.split_text(job.detail)
-        # for i, split in enumerate(splits):
-        #     print(f"Segment {i+1}:\n{split}\n")
+        splits = splitter.split_text(job_json)
+        for i, split in enumerate(splits):
+            print(f"Segment {i+1}:\n{split}\n")
 
         documents = [Document(page_content=text) for text in splits]
         vectordb = FAISS.from_documents(documents=documents, embedding=embeddings)
@@ -59,13 +61,13 @@ def main():
     问题: {input}"""
     )
     load_dotenv()
-    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+    GOOGLE_API_KEY = os.getenv("LLM_MODEL_KEY")
     model = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash", google_api_key=GOOGLE_API_KEY, verbose=True
+        model="gemini-1.5-pro", google_api_key=GOOGLE_API_KEY, verbose=True
     )
     document_chain = create_stuff_documents_chain(model, prompt)
     retrieval_chain = create_retrieval_chain(retriever, document_chain)
-    response = retrieval_chain.invoke({"input": "该岗位需要熟悉什么数据库？"})
+    response = retrieval_chain.invoke({"input": "该岗位名称是什么？"})
     print(response["answer"])
 
 

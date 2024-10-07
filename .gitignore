@@ -162,10 +162,9 @@ cython_debug/
 #.idea/
 
 **/__pycache__/
-koi_app.db
+
 .env
 resume/*.pdf
 
 # Ignore dynaconf secret files
 .secrets.*
-/cache/

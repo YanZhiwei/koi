@@ -168,3 +168,5 @@ resume/*.pdf
 
 # Ignore dynaconf secret files
 .secrets.*
+/cache
+koi_app.db

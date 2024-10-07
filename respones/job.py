@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from base.schemaMetaclass import SchemaMetaclass
-from models.job import Job as DB_Job_Schema
+from models.job import Job as DB_Job
 
 
 class JobDetail(BaseModel):

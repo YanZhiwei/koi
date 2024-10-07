@@ -29,6 +29,7 @@ def main():
         model_kwargs={"device": EMBEDDING_DEVICE},
     )
     faiss_db_path = f"./cache/job/{job.id}"
+    
     if not os.path.exists(faiss_db_path):
         print("FAISS vector database not found. Creating and saving...")
         splitter = CharacterTextSplitter(

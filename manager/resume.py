@@ -3,10 +3,8 @@ from os import path
 
 import torch
 from langchain.chains import RetrievalQA
-from langchain.document_loaders import PyPDFLoader
-from langchain.embeddings import CacheBackedEmbeddings
 from langchain.prompts import PromptTemplate
-from langchain.storage import LocalFileStore
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_huggingface import HuggingFaceEmbeddings

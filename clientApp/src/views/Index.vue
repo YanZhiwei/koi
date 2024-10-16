@@ -3,5 +3,9 @@
 </script>
 
 <template>
-  <router-view></router-view>
+<div>
+    Index
+</div>
 </template>
+
+

@@ -6,5 +6,5 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-
+  const ElIcon: typeof import('element-plus/es')['ElIcon']
 }

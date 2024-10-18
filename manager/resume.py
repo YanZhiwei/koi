@@ -1,4 +1,5 @@
 import hashlib
+import sys
 from os import path
 
 import torch
@@ -10,6 +11,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 
+sys.path.append("./")
 from llm.chatModel import ChatModel
 from manager.job import Job as JobManager
 from models.job import Job as DB_Job_Model
@@ -95,6 +97,6 @@ if __name__ == "__main__":
     resume = Resume(model,"2024-言志伟-研发简历.pdf")
     vectorstore = resume.get_vectorstore()
     manager=JobManager()
-    job = manager.get_job("9bd8100aa7981eea1HB739i4F1BU")
+    job = manager.get_job("ce4a6b2e5fb2719f1nV92d-9EVQ~")
     letter = resume.get_self_introduction(vectorstore, job)
     print(letter)

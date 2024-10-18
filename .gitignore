@@ -170,3 +170,4 @@ resume/*.pdf
 .secrets.*
 /cache
 koi_app.db
+/output_test

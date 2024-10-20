@@ -59,7 +59,7 @@ def job():
                 chat_manager.create_job_chat(
                     request=CreateJobChatRequest(
                         job_id=job.id,
-                        model_name=json.dumps( model.model_config,ensure_ascii=False),
+                        llm_model=json.dumps( model.model_config,ensure_ascii=False),
                         id=id,
                         resume_name="yanzhiwei",
                         self_introduce=letter,
@@ -96,7 +96,7 @@ async def async_job():
                     chat_manager.create_job_chat(
                         request=CreateJobChatRequest(
                             job_id=job.id,
-                            model_name=json.dumps( model.model_config,ensure_ascii=False),
+                            llm_model=model.model,
                             id=id,
                             resume_id=resume.key,
                             resume_name=resume.resume_pdf,
@@ -116,6 +116,7 @@ def schedule_async_job():
     asyncio.create_task(async_job())
     
 if __name__ == "__main__":
+    
     logger.configure(**log_configs)
     ModelBase.metadata.create_all(
         engine, tables=[Job.__table__, Job_Boss.__table__,Job_Chat.__table__]

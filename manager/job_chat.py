@@ -8,7 +8,7 @@ class Job_Chat(object):
         job_chat = DB_Job_Chat()
         job_chat.id=request.id
         job_chat.job_id=request.job_id
-        job_chat.model_name=request.model_name
+        job_chat.model_name=request.llm_model
         job_chat.resume_name=request.resume_name
         job_chat.self_introduce=request.self_introduce
         job_chat.resume_id=request.resume_id

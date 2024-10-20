@@ -54,7 +54,7 @@ class Resume(object):
         if path.exists(vectorstore_key):
             return FAISS.load_local(vectorstore_key, embeddings, allow_dangerous_deserialization=True)
         resume_text = self.read_resume()
-        text_splitter = CharacterTextSplitter(separator="\n\n",chunk_size=1200,chunk_overlap=100,length_function=len,is_separator_regex=False)
+        text_splitter = CharacterTextSplitter(separator="\n\n",chunk_size=600,chunk_overlap=100,length_function=len,is_separator_regex=False)
         chunks = text_splitter.split_text(resume_text)
         vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
         vectorstore.save_local(vectorstore_key)
@@ -97,6 +97,6 @@ if __name__ == "__main__":
     resume = Resume(model,"2024-言志伟-研发简历.pdf")
     vectorstore = resume.get_vectorstore()
     manager=JobManager()
-    job = manager.get_job("ce4a6b2e5fb2719f1nV92d-9EVQ~")
+    job = manager.get_job("ca144dedd1f800b61HZ_2Ni6FFpZ")
     letter = resume.get_self_introduction(vectorstore, job)
     print(letter)
